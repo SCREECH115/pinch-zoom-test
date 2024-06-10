@@ -1,3 +1,7 @@
 .fotorama__loaded--img {
    touch-action: none;
 }
+
+#img-test {
+   width: 200px;
+}
