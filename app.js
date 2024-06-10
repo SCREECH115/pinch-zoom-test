@@ -1,19 +1,16 @@
-
 const pinchZoom = (imageElement) => {
    let imageElementScale = 1;
  
    let start = {};
  
-   // Calculate distance between two fingers
    const distance = (event) => {
      return Math.hypot(event.touches[0].pageX - event.touches[1].pageX, event.touches[0].pageY - event.touches[1].pageY);
    };
  
    imageElement.addEventListener('touchstart', (event) => {
      if (event.touches.length === 2) {
-       event.preventDefault(); // Prevent page scroll
+       event.preventDefault(); 
  
-       // Calculate where the fingers have started on the X and Y axis
        start.x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
        start.y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
        start.distance = distance(event);
@@ -22,7 +19,7 @@ const pinchZoom = (imageElement) => {
  
    imageElement.addEventListener('touchmove', (event) => {
      if (event.touches.length === 2) {
-       event.preventDefault(); // Prevent page scroll
+       event.preventDefault(); 
  
        let scale;
        if (event.scale) {
@@ -33,8 +30,8 @@ const pinchZoom = (imageElement) => {
        }
        imageElementScale = Math.min(Math.max(1, scale), 4);
  
-       const deltaX = (((event.touches[0].pageX + event.touches[1].pageX) / 2) - start.x) * 2; // x2 for accelarated movement
-       const deltaY = (((event.touches[0].pageY + event.touches[1].pageY) / 2) - start.y) * 2; // x2 for accelarated movement
+       const deltaX = (((event.touches[0].pageX + event.touches[1].pageX) / 2) - start.x) * 2; 
+       const deltaY = (((event.touches[0].pageY + event.touches[1].pageY) / 2) - start.y) * 2; 
  
        const transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${imageElementScale})`;
        imageElement.style.transform = transform;
