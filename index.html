@@ -86,9 +86,10 @@
                 };
 
                 const onTouchEnd = (event) => {
-                  imageElement.style.transform = "";
-                  imageElement.style.WebkitTransform = "";
-                  imageElement.style.zIndex = "";
+                    if (currentScale === 1) {
+                        imageElement.style.transform = '';
+                        imageElement.style.transition = '';
+                    }
                 };
 
                 imageElement.addEventListener('touchstart', onTouchStart);
