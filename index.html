@@ -1,30 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Document</title>
-   <script src="./app.js" defer></script>
-   <link rel="stylesheet" href="app.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Przykład Pinch-Zoom z Fotoramą</title>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px auto;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .fotorama {
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-   <div class="fotorama__loaded--img">
-      <img src="https://i.pinimg.com/originals/07/b2/40/07b240561cb656aec289df602e603bee.png" id="img-test" alt="">
-   </div>
 
-   <div class="test">
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-      <h1>test</h1>
-   </div>
+    <h1>Przykład Pinch-Zoom z Fotoramą</h1>
+
+    <div class="fotorama" data-width="100%" data-ratio="16/9" data-nav="thumbs">
+        <img src="https://i.pinimg.com/originals/07/b2/40/07b240561cb656aec289df602e603bee.png" alt="Obraz 1">
+        <img src="https://via.placeholder.com/800x450/FF5733/FFFFFF?text=Obraz+2" alt="Obraz 2">
+        <img src="https://via.placeholder.com/800x450/33FF57/FFFFFF?text=Obraz+3" alt="Obraz 3">
+        <img src="https://via.placeholder.com/800x450/3357FF/FFFFFF?text=Obraz+4" alt="Obraz 4">
+        <img src="https://via.placeholder.com/800x450/FF33A1/FFFFFF?text=Obraz+5" alt="Obraz 5">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
+
+    <script>
+        const mobileProductZoom = () => {
+            const pinchZoom = (imageElement) => {
+                let initialScale = 1;
+                let currentScale = 1;
+                let startDistance = 0;
+                let lastTouchCenter = { x: 0, y: 0 };
+
+                const getDistance = (touches) => {
+                    const [touch1, touch2] = touches;
+                    const dx = touch2.clientX - touch1.clientX;
+                    const dy = touch2.clientY - touch1.clientY;
+                    return Math.hypot(dx, dy);
+                };
+
+                const getTouchCenter = (touches) => {
+                    const [touch1, touch2] = touches;
+                    return {
+                        x: (touch1.clientX + touch2.clientX) / 2,
+                        y: (touch1.clientY + touch2.clientY) / 2
+                    };
+                };
+
+                const onTouchStart = (event) => {
+                    if (event.touches.length === 2) {
+                        event.preventDefault();
+                        startDistance = getDistance(event.touches);
+                        lastTouchCenter = getTouchCenter(event.touches);
+                        initialScale = currentScale;
+                    }
+                };
+
+                const onTouchMove = (event) => {
+                    if (event.touches.length === 2) {
+                        event.preventDefault();
+                        const newDistance = getDistance(event.touches);
+                        const touchCenter = getTouchCenter(event.touches);
+                        currentScale = initialScale * (newDistance / startDistance);
+
+                        currentScale = Math.max(1, Math.min(currentScale, 4));
+
+                        const translateX = touchCenter.x - lastTouchCenter.x;
+                        const translateY = touchCenter.y - lastTouchCenter.y;
+
+                        imageElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+                        imageElement.style.transition = 'transform 0s';
+                    }
+                };
+
+                const onTouchEnd = (event) => {
+                    if (currentScale === 1) {
+                        imageElement.style.transform = '';
+                        imageElement.style.transition = '';
+                    }
+                };
+
+                imageElement.addEventListener('touchstart', onTouchStart);
+                imageElement.addEventListener('touchmove', onTouchMove);
+                imageElement.addEventListener('touchend', onTouchEnd);
+            };
+
+            document.querySelector('.fotorama').addEventListener('touchstart', (event) => {
+                const target = event.target;
+                if (target.tagName === 'IMG' && !target.hasAttribute('data-zoom-initialized')) {
+                    target.setAttribute('data-zoom-initialized', 'true');
+                    pinchZoom(target);
+                }
+            }, { passive: false });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            mobileProductZoom();
+        });
+    </script>
+
 </body>
 </html>
